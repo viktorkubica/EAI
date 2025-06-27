@@ -2,399 +2,506 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EAI AI Assistant</title>
-    <style>
-        body {
-            /* --- New background image --- */
-            background-image: url('https://github.com/viktorkubica/EAI/raw/main/5153829.jpg');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAI AI Assistant</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      /* --- Modern gradient background --- */
+        background-image: url('https://github.com/viktorkubica/EAI/raw/main/5153829.jpg');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+      
+      /* --- Apple-style system font stack --- */
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-            /* --- Existing styles --- */
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden; /* Prevents scrollbars on the main page */
-        }
+    /* Style for the EAI Logo */
+    .page-logo {
+      position: fixed;
+      top: 40px;
+      left: 40px;
+      height: 40px;
+      z-index: 900;
+      opacity: 0.9;
+      transition: opacity 0.3s ease;
+    }
 
-        /* Style for the EAI Logo */
-        .page-logo {
-            position: fixed;
-            top: 30px;
-            left: 40px;
-            height: 50px; /* Control size by height */
-            z-index: 900; /* Below the chat window (1000) */
-            /* Added a drop-shadow to make the logo stand out against the new background */
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-        }
+    .page-logo:hover {
+      opacity: 1;
+    }
 
-        .chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 400px;
-            height: 600px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
+    .chat-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 380px;
+      height: 600px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
 
-        .chat-container.minimized {
-            height: 50px;
-            width: 300px;
-        }
+    .chat-container.minimized {
+      height: 60px;
+      width: 320px;
+    }
 
-        .chat-header {
-            background: #0078d4;
-            color: white;
-            padding: 15px;
-            border-radius: 10px 10px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: default;
-        }
+    .chat-header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #1d1d1f;
+      padding: 16px 20px;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: default;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
 
-        .chat-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
+    .chat-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
 
-        .chat-controls {
-            display: flex;
-            gap: 10px;
-        }
+    .chat-controls {
+      display: flex;
+      gap: 8px;
+    }
 
-        .control-btn {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 16px;
-        }
+    .control-btn {
+      background: transparent;
+      border: none;
+      color: #1d1d1f;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      font-size: 18px;
+      position: relative;
+    }
 
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: white;
-        }
+    .control-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
 
-        .chat-body {
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            border-radius: 0 0 10px 10px;
-        }
+    .control-btn:active {
+      transform: scale(0.95);
+    }
 
-        .chat-container.minimized .chat-body {
-            display: none;
-        }
+    .chat-body {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      border-radius: 0 0 20px 20px;
+    }
 
-        .chat-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 0 0 10px 10px;
-        }
+    .chat-container.minimized .chat-body {
+      display: none;
+    }
 
-        .reopen-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #0078d4;
-            color: white;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
+    .chat-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0 0 20px 20px;
+      background: white;
+    }
 
-        .reopen-btn:hover {
-            transform: scale(1.1);
-            background: #106ebe;
-        }
+    .reopen-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
 
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0 0 10px 10px;
-            display: none;
-        }
+    .reopen-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.25);
+    }
 
-        .loading-overlay.show {
-            display: flex;
-        }
+    .reopen-btn:active {
+      transform: translateY(0);
+    }
 
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0078d4;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 0 20px 20px;
+      display: none;
+    }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    .loading-overlay.show {
+      display: flex;
+    }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+    .loader {
+      width: 48px;
+      height: 48px;
+      position: relative;
+    }
 
-        .modal-overlay.show {
-            display: flex;
-            opacity: 1;
-        }
+    .loader::before,
+    .loader::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #667eea;
+      animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    }
 
-        .modal-dialog {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            text-align: center;
-            width: 90%;
-            max-width: 320px;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-        
-        .modal-overlay.show .modal-dialog {
-            transform: scale(1);
-        }
+    .loader::after {
+      animation-delay: 0.5s;
+      border-top-color: #764ba2;
+    }
 
-        .modal-message {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: #333;
-        }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
 
-        .modal-btn {
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
+    .modal-overlay.show {
+      display: flex;
+      opacity: 1;
+    }
 
-        .modal-btn.confirm {
-            background-color: #0078d4;
-            color: white;
-        }
+    .modal-dialog {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 340px;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+     
+    .modal-overlay.show .modal-dialog {
+      transform: scale(1) translateY(0);
+    }
 
-        .modal-btn.confirm:hover {
-            background-color: #106ebe;
-        }
-        
-        .modal-btn.cancel {
-            background-color: #e1e1e1;
-            color: #333;
-        }
+    .modal-message {
+      margin: 0 0 24px 0;
+      font-size: 17px;
+      color: #1d1d1f;
+      line-height: 1.4;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
 
-        .modal-btn.cancel:hover {
-            background-color: #d1d1d1;
-        }
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .page-logo {
-                /* Hide logo on smaller screens where chat becomes full-screen */
-                display: none;
-            }
-            .chat-container {
-                width: 100%;
-                height: 100%;
-                bottom: 0;
-                right: 0;
-                border-radius: 0;
-            }
+    .modal-btn {
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      letter-spacing: -0.01em;
+      min-width: 100px;
+    }
 
-            .chat-header {
-                border-radius: 0;
-            }
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
 
-            .chat-iframe {
-                border-radius: 0;
-            }
+    .modal-btn.confirm:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
 
-            .chat-container.minimized {
-                width: 100%;
-                height: 50px;
-                bottom: 0;
-                border-radius: 0;
-            }
-        }
-    </style>
+    .modal-btn.confirm:active {
+      transform: translateY(0);
+    }
+     
+    .modal-btn.cancel {
+      background: rgba(0, 0, 0, 0.06);
+      color: #1d1d1f;
+    }
+
+    .modal-btn.cancel:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .page-logo {
+        top: 20px;
+        left: 20px;
+        height: 32px;
+      }
+      
+      .chat-container {
+        width: calc(100% - 20px);
+        height: calc(100% - 100px);
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        border-radius: 16px;
+      }
+
+      .chat-header {
+        border-radius: 16px 16px 0 0;
+        padding: 14px 16px;
+      }
+
+      .chat-iframe {
+        border-radius: 0 0 16px 16px;
+      }
+
+      .chat-container.minimized {
+        width: calc(100% - 20px);
+        height: 60px;
+        bottom: 10px;
+      }
+
+      .reopen-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      }
+
+      .chat-container {
+        background: rgba(30, 30, 30, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .chat-header {
+        background: rgba(40, 40, 40, 0.8);
+        color: #f5f5f7;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .control-btn {
+        color: #f5f5f7;
+      }
+
+      .control-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .modal-dialog {
+        background: rgba(30, 30, 30, 0.95);
+      }
+
+      .modal-message {
+        color: #f5f5f7;
+      }
+
+      .modal-btn.cancel {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f5f5f7;
+      }
+
+      .modal-btn.cancel:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- EAI Logo added to the page -->
-    <img src="https://eai.eu/wp-content/uploads/2024/02/EAI-innovation-centred-1.png" alt="EAI Innovating Research Logo" class="page-logo">
+  <!-- EAI Logo added to the page -->
+  <img src="https://eai.eu/wp-content/uploads/2024/02/EAI-innovation-centred-1.png" alt="EAI Innovating Research Logo" class="page-logo">
 
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-header" id="chatHeader">
-            <div class="chat-title">AI Assistant</div>
-            <div class="chat-controls">
-                <button class="control-btn" id="restartBtn" title="Restart Conversation">↻</button>
-                <button class="control-btn" id="minimizeBtn" title="Minimize">−</button>
-                <button class="control-btn" id="closeBtn" title="Close">×</button>
-            </div>
-        </div>
-        <div class="chat-body">
-            <iframe 
-                id="chatIframe"
-                class="chat-iframe"
-                src="">
-            </iframe>
-            <div class="loading-overlay" id="loadingOverlay">
-                <div class="loader"></div>
-            </div>
-        </div>
+  <div class="chat-container" id="chatContainer">
+    <div class="chat-header" id="chatHeader">
+      <div class="chat-title">AI Assistant</div>
+      <div class="chat-controls">
+        <button class="control-btn" id="restartBtn" title="Restart Conversation">↻</button>
+        <button class="control-btn" id="minimizeBtn" title="Minimize">−</button>
+        <button class="control-btn" id="closeBtn" title="Close">×</button>
+      </div>
     </div>
-
-    <button class="reopen-btn" id="reopenBtn">💬</button>
-
-    <!-- Custom Confirmation Modal HTML -->
-    <div class="modal-overlay" id="confirmationModal">
-        <div class="modal-dialog">
-            <p class="modal-message" id="modalMessageText"></p>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
-                <button class="modal-btn confirm" id="modalConfirmBtn">Confirm</button>
-            </div>
-        </div>
+    <div class="chat-body">
+      <iframe 
+        id="chatIframe"
+        class="chat-iframe"
+        src="">
+      </iframe>
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Get elements
-        const chatContainer = document.getElementById('chatContainer');
-        const minimizeBtn = document.getElementById('minimizeBtn');
-        const closeBtn = document.getElementById('closeBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const reopenBtn = document.getElementById('reopenBtn');
-        const chatIframe = document.getElementById('chatIframe');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const confirmationModal = document.getElementById('confirmationModal');
-        const modalMessageText = document.getElementById('modalMessageText');
-        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
-        const modalCancelBtn = document.getElementById('modalCancelBtn');
+  <button class="reopen-btn" id="reopenBtn">💬</button>
 
-        let isMinimized = false;
-        const CHAT_BASE_URL = 'https://copilotstudio.microsoft.com/environments/Default-b25736d2-bbc9-419d-9c5a-389c92ea93ce/bots/cr5bf_eaiPublications/webchat?__version__=2';
+  <!-- Custom Confirmation Modal HTML -->
+  <div class="modal-overlay" id="confirmationModal">
+    <div class="modal-dialog">
+      <p class="modal-message" id="modalMessageText"></p>
+      <div class="modal-buttons">
+        <button class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
+        <button class="modal-btn confirm" id="modalConfirmBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
 
-        function getNewChatUrl() {
-            return `${CHAT_BASE_URL}&t=${new Date().getTime()}`;
-        }
+  <script>
+    // Get elements
+    const chatContainer = document.getElementById('chatContainer');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const reopenBtn = document.getElementById('reopenBtn');
+    const chatIframe = document.getElementById('chatIframe');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const modalMessageText = document.getElementById('modalMessageText');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
 
-        function loadChat() {
-            loadingOverlay.classList.add('show');
-            chatIframe.src = 'about:blank';
-            setTimeout(() => {
-                chatIframe.src = getNewChatUrl();
-                chatIframe.onload = () => {
-                    loadingOverlay.classList.remove('show');
-                };
-            }, 100);
-        }
+    let isMinimized = false;
+    const CHAT_BASE_URL = 'https://copilotstudio.microsoft.com/environments/Default-b25736d2-bbc9-419d-9c5a-389c92ea93ce/bots/cr5bf_eaiPublications/webchat?__version__=2';
 
-        function showConfirmation(message) {
-            return new Promise((resolve) => {
-                modalMessageText.textContent = message;
-                confirmationModal.classList.add('show');
-                modalConfirmBtn.addEventListener('click', () => {
-                    confirmationModal.classList.remove('show');
-                    resolve(true);
-                }, { once: true });
-                modalCancelBtn.addEventListener('click', () => {
-                    confirmationModal.classList.remove('show');
-                    resolve(false);
-                }, { once: true });
-            });
-        }
+    function getNewChatUrl() {
+      return `${CHAT_BASE_URL}&t=${new Date().getTime()}`;
+    }
 
-        window.addEventListener('load', () => {
-            loadChat();
-        });
+    function loadChat() {
+      loadingOverlay.classList.add('show');
+      chatIframe.src = 'about:blank';
+      setTimeout(() => {
+        chatIframe.src = getNewChatUrl();
+        chatIframe.onload = () => {
+          loadingOverlay.classList.remove('show');
+        };
+      }, 100);
+    }
 
-        minimizeBtn.addEventListener('click', () => {
-            isMinimized = !isMinimized;
-            chatContainer.classList.toggle('minimized');
-            minimizeBtn.innerHTML = isMinimized ? '&#43;' : '&minus;';
-        });
+    function showConfirmation(message) {
+      return new Promise((resolve) => {
+        modalMessageText.textContent = message;
+        confirmationModal.classList.add('show');
+        modalConfirmBtn.addEventListener('click', () => {
+          confirmationModal.classList.remove('show');
+          resolve(true);
+        }, { once: true });
+        modalCancelBtn.addEventListener('click', () => {
+          confirmationModal.classList.remove('show');
+          resolve(false);
+        }, { once: true });
+      });
+    }
 
-        closeBtn.addEventListener('click', async () => {
-            if (await showConfirmation('Are you sure you want to close the chat? This will end your current conversation.')) {
-                chatIframe.src = 'about:blank';
-                chatContainer.style.display = 'none';
-                reopenBtn.style.display = 'flex';
-            }
-        });
+    window.addEventListener('load', () => {
+      loadChat();
+    });
 
-        reopenBtn.addEventListener('click', () => {
-            chatContainer.style.display = 'flex';
-            reopenBtn.style.display = 'none';
-            loadChat();
-        });
+    minimizeBtn.addEventListener('click', () => {
+      isMinimized = !isMinimized;
+      chatContainer.classList.toggle('minimized');
+      minimizeBtn.innerHTML = isMinimized ? '&#43;' : '&minus;';
+    });
 
-        restartBtn.addEventListener('click', async () => {
-            if (await showConfirmation('Are you sure you want to restart the conversation? This will clear your chat history.')) {
-                loadChat();
-            }
-        });
+    closeBtn.addEventListener('click', async () => {
+      if (await showConfirmation('Are you sure you want to close the chat? This will end your current conversation.')) {
+        chatIframe.src = 'about:blank';
+        chatContainer.style.display = 'none';
+        reopenBtn.style.display = 'flex';
+      }
+    });
 
-        window.addEventListener('beforeunload', () => {
-            chatIframe.src = 'about:blank';
-        });
-    </script>
+    reopenBtn.addEventListener('click', () => {
+      chatContainer.style.display = 'flex';
+      reopenBtn.style.display = 'none';
+      loadChat();
+    });
+
+    restartBtn.addEventListener('click', async () => {
+      if (await showConfirmation('Are you sure you want to restart the conversation? This will clear your chat history.')) {
+        loadChat();
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      chatIframe.src = 'about:blank';
+    });
+  </script>
 </body>
 </html>
